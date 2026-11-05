@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0C0B0B" />
+    <meta name="description" content="A design and development studio. Custom websites and web apps." />
+    <title>Studio Hero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      document.documentElement.classList.add('booting');
+      setTimeout(function () { document.documentElement.classList.remove('booting'); }, 6000);
+    </script>
+  </head>
+  <body>
+    <div class="boot" id="boot" role="dialog" aria-label="Loading" hidden>
+      <div class="boot-win">
+        <div class="boot-title"><b>Studio Installer</b></div>
+        <div class="boot-body">
+          <span>Installing 1-bit charm</span>
+          <div class="boot-bar" aria-hidden="true"><i id="boot-fill"></i></div>
+          <span id="boot-eta">Time remaining: 42 years</span>
+          <div class="boot-row"><small>Please do not turn off your computer</small><button class="boot-skip" id="boot-skip" type="button">Skip</button></div>
+        </div>
+      </div>
+    </div>
+
+    <header class="site-header" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Studio home">WD</a>
+      <p class="status"><span aria-hidden="true"></span> 00 Intro</p>
+      <p class="clock" id="clock" aria-label="Local time"></p>
+      <button class="era" id="era" type="button" aria-pressed="false">Back to 1984</button>
+      <a class="header-cta" href="#contact">Start a project</a>
+      <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="menu">
+        <span>Menu</span><i aria-hidden="true"></i>
+      </button>
+    </header>
+
+    <nav class="menu" id="menu" aria-label="Menu" hidden>
+      <a href="#work">Work</a><a href="#approach">Approach</a><a href="#studio">Studio</a><a href="#contact">Say hello</a>
+    </nav>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-grid" aria-hidden="true">
+          <span class="ring ring-large"></span>
+          <span class="ring ring-small"></span>
+          <span class="axis axis-x"></span>
+          <span class="axis axis-y"></span>
+          <small class="grid-label label-top"><b></b> Fig. 01 · Keypad</small>
+          <small class="grid-label label-right" id="lbl-x">x 0.70</small>
+          <small class="grid-label label-left" id="lbl-y">y 0.33</small>
+        </div>
+
+        <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero-shade" aria-hidden="true"></div>
+
+        <div class="hero-content">
+          <h1 id="hero-title">
+            <span class="line"><span>Pixels change.</span></span>
+            <span class="line line-offset"><span>Taste stays.</span></span>
+          </h1>
+          <div class="hero-side">
+            <p>We are a design and development studio. We shape distinctive websites and useful digital products.</p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="#work"><span>View our projects</span><i aria-hidden="true">↗</i></a>
+              <a class="button button-ghost" href="#contact"><span>Start a project</span></a>
+            </div>
+          </div>
+        </div>
+
+        <footer class="hero-footer">
+          <span>Fig. 01 · Web design and development</span>
+          <span>Since 2022</span>
+        </footer>
+      </section>
+    </main>
+
+    <noscript><style>.boot{display:none}html.booting *{animation-play-state:running!important}</style></noscript>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.min.js"></script>
+    <script defer src="script.js"></script>
+  </body>
+</html>
