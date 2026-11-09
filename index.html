@@ -1,86 +1,178 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0C0B0B" />
-    <meta name="description" content="A design and development studio. Custom websites and web apps." />
-    <title>Studio Hero</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-    <link rel="stylesheet" href="styles.css" />
-    <script>
-      document.documentElement.classList.add('booting');
-      setTimeout(function () { document.documentElement.classList.remove('booting'); }, 6000);
-    </script>
-  </head>
-  <body>
-    <div class="boot" id="boot" role="dialog" aria-label="Loading" hidden>
-      <div class="boot-win">
-        <div class="boot-title"><b>Studio Installer</b></div>
-        <div class="boot-body">
-          <span>Installing 1-bit charm</span>
-          <div class="boot-bar" aria-hidden="true"><i id="boot-fill"></i></div>
-          <span id="boot-eta">Time remaining: 42 years</span>
-          <div class="boot-row"><small>Please do not turn off your computer</small><button class="boot-skip" id="boot-skip" type="button">Skip</button></div>
-        </div>
-      </div>
-    </div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halftone | Custom web design and development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&family=Geist+Mono:wght@100..900&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+<!-- Same libraries + versions as the reference: GSAP 3.15.0 (+ScrollTrigger), Lenis 1.3.26, Three.js r186 -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.26/dist/lenis.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+} }
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <header class="site-header" aria-label="Primary navigation">
-      <a class="brand" href="#top" aria-label="Studio home">WD</a>
-      <p class="status"><span aria-hidden="true"></span> 00 Intro</p>
-      <p class="clock" id="clock" aria-label="Local time"></p>
-      <button class="era" id="era" type="button" aria-pressed="false">Back to 1984</button>
-      <a class="header-cta" href="#contact">Start a project</a>
-      <button class="menu-button" id="menu-button" type="button" aria-expanded="false" aria-controls="menu">
-        <span>Menu</span><i aria-hidden="true"></i>
-      </button>
-    </header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="safelight" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values=".3 .59 .11 0 0  .3 .59 .11 0 0  .3 .59 .11 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="table" tableValues="0.035 0.42 0.84 0.97"/><feFuncG type="table" tableValues="0.03 0.03 0.12 0.88"/><feFuncB type="table" tableValues="0.03 0.06 0.2 0.86"/></feComponentTransfer></filter></svg>
 
-    <nav class="menu" id="menu" aria-label="Menu" hidden>
-      <a href="#work">Work</a><a href="#approach">Approach</a><a href="#studio">Studio</a><a href="#contact">Say hello</a>
+<!-- LOADER -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-grid" id="ldGrid"></div>
+  <svg class="loader-mark" id="ldMark" viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="currentColor" d="M2 3h5v7h10V3h5v18h-5v-7H7v7H2z"/></svg>
+  <div class="loader-bar"><i id="ldBar"></i></div>
+</div>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <a href="#intro" class="logo" aria-label="Home"><svg viewBox="0 0 24 24" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 3h5v7h10V3h5v18h-5v-7H7v7H2z"/></svg><span data-c="brand">halftone</span></a>
+  <span class="sep"></span>
+  <div class="secind meta" aria-live="off"><span class="wrap"><span class="num" id="siNum">00</span></span><span class="wrap"><span id="siLbl">Intro</span></span><span class="bar"><i id="siBar"></i></span></div>
+  <span class="grow"></span>
+  <span class="meta clock"><span data-c="city">Cairo</span> <time class="clk">--:--</time></span>
+  <button class="pill" id="sndBtn" type="button" aria-pressed="true" aria-label="Toggle interface sounds"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h3l4-3v10L5 10H2z" fill="none" stroke="currentColor"/><path class="w" d="M11 5.5c1 .8 1 4.2 0 5M12.8 3.8c2 1.8 2 6.6 0 8.4" fill="none" stroke="currentColor"/></svg><span id="sndLbl">Sound on</span></button>
+  <button class="pill" id="eraBtn" type="button"><svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><path d="M3 1h10v10H3zM5 3h6v5H5zM2 12h12v3H2zM9 13h3v1H9z" fill="none" stroke="currentColor"/></svg><span id="eraLbl">Back to 1984</span></button>
+  <button class="btn sm" type="button" data-act="contact">Start a project</button>
+  <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu"><span id="menuLbl">Menu</span><span class="ic" aria-hidden="true"><i></i><i></i></span></button>
+</header>
+
+<div class="menu" id="menu" aria-hidden="true">
+  <div class="menu-in">
+    <nav aria-label="Main">
+      <a href="#work" data-mi><span class="n">01</span><span class="t">Work</span></a>
+      <a href="#approach" data-mi><span class="n">02</span><span class="t">Approach</span></a>
+      <a href="#studio" data-mi><span class="n">03</span><span class="t">Studio</span></a>
+      <a href="#contact" data-mi><span class="n">04</span><span class="t">Contact</span></a>
     </nav>
+    <div class="menu-art" id="menuArt"></div>
+  </div>
+  <div class="menu-foot meta"><a data-c="emailLink" href="mailto:hello@yourstudio.com">hello@yourstudio.com</a><span data-c="addressLine">Street 00, City</span><span class="lang"><b>EN</b></span></div>
+</div>
 
-    <main id="top">
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-grid" aria-hidden="true">
-          <span class="ring ring-large"></span>
-          <span class="ring ring-small"></span>
-          <span class="axis axis-x"></span>
-          <span class="axis axis-y"></span>
-          <small class="grid-label label-top"><b></b> Fig. 01 · Keypad</small>
-          <small class="grid-label label-right" id="lbl-x">x 0.70</small>
-          <small class="grid-label label-left" id="lbl-y">y 0.33</small>
-        </div>
+<main>
+<!-- 00 · HERO -->
+<section class="hero grain" id="intro" data-si="00|Intro">
+  <div class="hero-grid" aria-hidden="true">
+    <div class="dots"></div>
+    <div class="circ" style="left:calc(70% - 380px);top:calc(35% - 380px);width:760px;height:760px"></div>
+    <div class="circ" style="left:calc(70% - 230px);top:calc(35% - 230px);width:460px;height:460px;border-style:dashed"></div>
+    <div class="hl" style="left:0;right:0;top:35%"></div>
+    <div class="vl" style="top:0;bottom:0;left:70%"></div>
+  </div>
+  <span class="xlbl meta" id="xL" style="left:46%;top:calc(35% - 22px)">x 0.33</span>
+  <span class="xlbl meta" id="xR" style="right:var(--gut);top:calc(35% - 22px)">y 0.78</span>
+  <span class="figlbl meta" style="left:74%;top:10%"><span class="dot"></span>Fig. 01 · Keypad</span>
+  <div id="kpGL" aria-label="Interactive 3D keypad. Click a key." role="img"></div>
+  <h1 class="hero-title" id="heroTitle" aria-label="New pixels. Old-school care."><span class="ln"><span>New pixels.</span></span><span class="ln"><span>Old-school care.</span></span></h1>
+  <div class="hero-side" id="heroSide">
+    <p><span data-c="brand">Halftone</span> is a design and development studio in <span data-c="city">Cairo</span>. We design and build custom websites and web apps.</p>
+    <div class="acts">
+      <a class="btn" href="#work" data-arrow>View our projects</a>
+      <button class="btn ghost" type="button" data-act="contact">Start a project</button>
+    </div>
+  </div>
+  <div class="hero-foot meta"><span>Fig. 01 · Web design and development</span><span>Since <span data-c="since">2022</span></span></div>
+</section>
 
-        <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
-        <div class="hero-shade" aria-hidden="true"></div>
+<!-- 01 · STUDIO -->
+<section class="studio paper" id="studio" data-si="01|Studio">
+  <h2 class="sr">Studio</h2>
+  <p class="label meta"><i></i>Studio</p>
+  <p class="statement" id="statement">Small on purpose, close at every step. One point of contact for your whole website, with the same care and attention from the very first conversation <em>to the finishing touches at launch.</em></p>
+  <figure class="dev portrait" id="portrait"><img alt="A cassette tape standing in front of a vintage typewriter, with the tape spilling out"><img class="safe" alt=""><span class="portrait-cap meta">Fig. 02</span></figure>
+  <dl class="facts">
+    <div><dt class="meta">Based in</dt><dd><span data-c="city">Cairo</span>, since <span data-c="since">2022</span></dd></div>
+    <div><dt class="meta">Tools</dt><dd>Shaders, scripts, far too much tea</dd></div>
+  </dl>
+  <div class="h-links"><button class="btn ghost-ink sm" type="button" data-act="about">About the studio</button><a class="btn ghost-ink sm" href="#approach">Our approach</a></div>
+</section>
 
-        <div class="hero-content">
-          <h1 id="hero-title">
-            <span class="line"><span>Pixels change.</span></span>
-            <span class="line line-offset"><span>Taste stays.</span></span>
-          </h1>
-          <div class="hero-side">
-            <p>We are a design and development studio. We shape distinctive websites and useful digital products.</p>
-            <div class="hero-actions">
-              <a class="button button-primary" href="#work"><span>View our projects</span><i aria-hidden="true">↗</i></a>
-              <a class="button button-ghost" href="#contact"><span>Start a project</span></a>
-            </div>
-          </div>
-        </div>
+<!-- 02 · APPROACH -->
+<section class="approach grain" id="approach" data-si="02|Approach">
+  <div class="ap-pin" id="apPin">
+    <div id="macGL" role="img" aria-label="A vintage computer showing each step of the process"></div>
+    <p class="ap-lbl meta label"><i></i>Approach</p>
+    <h2 class="ap-word d1" id="wD1"><span>Design</span></h2>
+    <h2 class="ap-word d2" id="wD2"><span>Development</span></h2>
+    <div class="ap-step" id="apStep"></div>
+    <ol class="ap-idx meta" id="apIdx"></ol>
+    <p class="ap-hint meta label" id="apHint"><i></i>Fig. 03 · Press the buttons <span class="k">F</span><span class="k">T</span><span class="k">R</span><span class="k">P</span></p>
+    <div class="paperfade" id="paperfade"></div>
+  </div>
+</section>
 
-        <footer class="hero-footer">
-          <span>Fig. 01 · Web design and development</span>
-          <span>Since 2022</span>
-        </footer>
-      </section>
-    </main>
+<!-- 03 · WORK -->
+<section class="paper" id="work-intro" data-si="03|Work">
+  <div class="work-intro">
+    <div class="lbl meta"><p class="label"><i></i>Selected work</p><span id="wkTotal">04 projects</span></div>
+    <h2 id="wkH">Selected work</h2>
+    <p>Recent websites, designed and built to measure by the same small studio.</p>
+  </div>
+</section>
+<section class="work" id="work" data-si="03|Work">
+  <div id="stage">
+    <div class="shots" id="shots"></div>
+    <div class="wk-shade"></div>
+    <div class="w-slit"></div>
+    <div class="wk-count meta"><span class="cur" id="wCur"><span>01</span></span><span>/ <span id="wTot">04</span></span></div>
+    <ol class="w-index meta" id="wIndex"></ol>
+    <div class="wk-cat meta" id="wSector"></div>
+    <div class="w-names" id="wNames"></div>
+    <div class="w-infos" id="wInfos"></div>
+    <div id="wBar"></div>
+  </div>
+</section>
 
-    <noscript><style>.boot{display:none}html.booting *{animation-play-state:running!important}</style></noscript>
-    <script defer src="https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.min.js"></script>
-    <script defer src="script.js"></script>
-  </body>
+<!-- ONE STUDIO -->
+<section class="one" id="one" data-si="03|Work">
+  <div class="one-pin" id="onePin">
+    <div class="one-top meta"><span class="label"><span class="dot"></span>One studio</span><span id="oneCount">01 / 04</span></div>
+    <h2 class="one-word" id="oneWord" aria-label="Design. Development. Motion. One studio."></h2>
+    <div class="one-bot"><p>Design, development and motion under one roof.</p><a class="ulink" href="#work">View all projects <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 10L10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></a></div>
+  </div>
+</section>
+</main>
+
+<!-- 04 · CONTACT / FOOTER -->
+<footer class="foot" id="contact" data-si="04|Contact">
+  <div class="ft-top meta"><span class="label"><span class="dot"></span>Contact</span><span><span data-c="city">Cairo</span> <time class="clk">--:--</time></span></div>
+  <h2 class="ft-h"><span class="ln"><span>A project</span></span><span class="ln"><span>in mind?</span></span></h2>
+  <div class="ft-grid">
+    <div><a class="ft-mail ulink" data-c="emailLink" href="mailto:hello@yourstudio.com">hello@yourstudio.com</a><br><button class="ulink sm" type="button" data-act="contact">Start a project <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 10L10 2M4 2h6v6" fill="none" stroke="currentColor" stroke-width="1.4"/></svg></button></div>
+    <nav class="ft-nav" aria-label="Footer"><a href="#intro">Home</a><a href="#work">Work</a><a href="#approach">Approach</a><a href="#studio">Studio</a><a href="#contact">Contact</a></nav>
+    <div class="ft-det meta">
+      <div><span data-c="addr1">Street 00</span><br><span data-c="addr2">0000 City</span><br><span data-c="company">Company no.</span></div>
+      <div style="display:grid;gap:2px"><button type="button" data-act="privacy">Privacy</button><button type="button" data-act="policy">Cookies</button><button type="button" data-act="prefs">Cookie settings</button></div>
+      <span class="lang"><b>EN</b></span>
+    </div>
+  </div>
+  <div class="ft-end">
+    <div class="hello" id="hello" aria-hidden="true"></div>
+    <div class="r meta"><button type="button" id="toTop">Back to top ↑</button><span>© <span id="yr">2026</span> <span data-c="brand">Halftone</span></span></div>
+  </div>
+</footer>
+
+<!-- cookie banner -->
+<div class="ck" id="ck" role="dialog" aria-labelledby="ckH">
+  <span class="meta label"><span class="dot"></span>Cookies</span>
+  <h3 id="ckH">Your privacy matters.</h3>
+  <p>We only use what the site needs to work. With your permission, we may later also measure how the site is used.</p>
+  <div class="row"><button class="btn" type="button" data-ck="all">Accept all</button><button class="btn ghost" type="button" data-ck="decline">Decline</button><button class="btn ghost full" type="button" data-ck="manage">Manage preferences</button></div>
+  <button class="pol meta" type="button" data-act="policy">Cookie policy</button>
+</div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="wipe" id="wipe" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status"></div>
+
+
+
+<script type="module" src="main.js"></script>
+</body>
 </html>
