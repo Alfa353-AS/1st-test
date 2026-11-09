@@ -131,6 +131,7 @@ document.addEventListener("pointerdown", e => {
 }, true);
 document.addEventListener("click", e => { if (e.detail === 0 && e.target.closest("button, a")) Sound.play("click"); }, true);
 document.addEventListener("pointerover", e => {
+  if (e.pointerType !== "mouse") return;
   const t = e.target.closest(".btn, .pill, .menu-btn, .ulink, .w-index button, .ap-idx button, .menu nav a, .ft-nav a, .logo");
   if (t && !t.contains(e.relatedTarget)) Sound.play("hover");
 });
@@ -141,6 +142,7 @@ document.addEventListener("change", e => { if (e.target.matches(".tg")) Sound.pl
    LENIS + GSAP SCROLLTRIGGER (same wiring the reference uses)
    ========================================================= */
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
 const lenis = (reduced || !matchMedia("(min-width: 992px)").matches || matchMedia("(pointer: coarse)").matches) ? null : new Lenis({ lerp:.07, wheelMultiplier:1, gestureOrientation:"vertical" });
 if (lenis) window.lenis = lenis;
 try { history.scrollRestoration = "manual"; } catch {}
@@ -169,6 +171,7 @@ $("#toTop").addEventListener("click", () => scrollToTarget(0, { duration: 2.2 })
   ScrollTrigger.create({ start: 0, end: "max", onUpdate: s => {
     const y = s.scroll();
     nav.classList.toggle("hide", y > last && y > 300 && !menuOpen);
+    nav.classList.toggle("solid", y > 40);
     last = y;
     gsap.set("#siBar", { scaleX: s.progress });
   }});
@@ -362,7 +365,18 @@ const Keypad = (() => {
     ray.setFromCamera(ptr, camera); const hit = ray.intersectObjects([...keys, kb])[0];
     hover = hit ? hit.object : null; host.style.cursor = hover ? "pointer" : "grab";
   });
-  host.addEventListener("pointerdown", () => {
+  const kv = new THREE.Vector3();
+  const hitAt = e => {
+    const hr = host.getBoundingClientRect();
+    ptr.set(((e.clientX - hr.left) / hr.width) * 2 - 1, -((e.clientY - hr.top) / hr.height) * 2 + 1);
+    ray.setFromCamera(ptr, camera); const h = ray.intersectObjects([...keys, kb])[0]; if (h) return h.object;
+    // nothing directly under the finger: pick the nearest key/knob within reach
+    const reach = e.pointerType === "mouse" ? 0 : 34; let best = null, bd = reach;
+    [...keys, kb].forEach(o => { o.getWorldPosition(kv).project(camera); const sx = (kv.x + 1) / 2 * hr.width + hr.left, sy = (1 - kv.y) / 2 * hr.height + hr.top, d = Math.hypot(sx - e.clientX, sy - e.clientY); if (d < bd){ bd = d; best = o; } });
+    return best;
+  };
+  host.addEventListener("pointerdown", e => {
+    hover = hitAt(e);
     if (!hover) return;
     if (hover === kb){ Sound.play("knob"); knobV += .35; scrText = "vol " + Math.round(((knobA % 6.28) + 6.28) % 6.28 / 6.28 * 100); drawScreen("KNOB"); return; }
     press(hover.userData.i);
@@ -729,7 +743,13 @@ const Approach = (() => {
   // pointer: hover + press buttons, click the screen for a random effect
   const ray = new THREE.Raycaster(), ptr = new THREE.Vector2(), host = $("#macGL");
   let hoverObj = null;
-  const pick = e => { const r = host.getBoundingClientRect(); ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ptr, camera); const hit = ray.intersectObjects([...btns, glass])[0]; return hit ? hit.object : null; };
+  const bv = new THREE.Vector3();
+  const pick = e => {
+    const r = host.getBoundingClientRect(); ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ptr, camera);
+    const reach = e.pointerType === "mouse" ? 12 : 30; let best = null, bd = reach;
+    btns.forEach(o => { o.getWorldPosition(bv).project(camera); const sx = (bv.x + 1) / 2 * r.width + r.left, sy = (1 - bv.y) / 2 * r.height + r.top, d = Math.hypot(sx - e.clientX, sy - e.clientY); if (d < bd){ bd = d; best = o; } });
+    if (best) return best;
+    const hit = ray.intersectObjects([...btns, glass])[0]; return hit ? hit.object : null; };
   host.addEventListener("pointermove", e => { if (P.zoom > .05){ hoverObj = null; host.style.cursor = ""; return; } const o = pick(e); if (o !== hoverObj && o && o !== glass) Sound.play("hover"); hoverObj = o; host.style.cursor = o ? "pointer" : ""; });
   host.addEventListener("pointerleave", () => { hoverObj = null; host.style.cursor = ""; });
   host.addEventListener("pointerdown", e => {
@@ -758,7 +778,8 @@ const Approach = (() => {
     mac.scale.setScalar(P.scale);
     px = lerp(px, tpx, .06);
     mac.rotation.y = (-.32 * P.safe + px * .25 + (reduced ? 0 : Math.sin(t * .6) * .03)) * (1 - z);
-    camera.position.set(0, lerp(.35, .55, z), lerp(14, 1.9, z)); camera.lookAt(0, lerp(.2, .55, z), 0);
+    const mob = innerWidth < 860, z0 = mob ? 17 : 14, ly = mob ? -.9 : .2;
+    camera.position.set(0, lerp(ly + .15, .55, z), lerp(z0, 1.9, z)); camera.lookAt(0, lerp(ly, .55, z), 0);
     animBtns();
     drawScr();
     S.render();

@@ -93,6 +93,11 @@ img,canvas,svg{display:block;max-width:100%}
    ========================================================= */
 .nav{position:fixed;inset:0 0 auto;z-index:100;height:var(--navH);padding:0 var(--gut);display:flex;align-items:center;gap:24px;color:var(--paper);transition:transform .7s var(--ease),color .4s}
 .nav.hide{transform:translateY(-100%)}
+.nav::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(12,11,11,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);opacity:0;transition:opacity .4s}
+.nav.solid::before{opacity:1}
+.nav.solid.on-paper::before{background:rgba(243,241,236,.9)}
+html.y84 .nav.solid::before{background:#000;backdrop-filter:none}
+html.y84 .nav.solid.on-paper::before{background:#fff}
 .nav.on-paper{color:var(--ink)}
 .logo{display:flex;align-items:center;gap:8px;font:800 22px/1 var(--sans);letter-spacing:-.06em}
 .logo svg{width:22px;height:22px;color:var(--crimson-lit)}
@@ -108,7 +113,7 @@ img,canvas,svg{display:block;max-width:100%}
 .pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1px solid rgba(243,241,236,.3);border-radius:99px;font:400 12px/1 var(--mono);transition:border-color .3s,background .3s,color .3s}
 .nav.on-paper .pill{border-color:rgba(12,11,11,.3)}
 .pill:hover{border-color:currentColor}
-.pill svg{width:14px;height:14px}
+.pill svg{width:14px;height:14px;flex:none}
 .pill.off svg .w{opacity:0}
 .pill.off{opacity:.6}
 .nav .btn.sm{height:36px;font-size:14px}
@@ -181,7 +186,7 @@ img,canvas,svg{display:block;max-width:100%}
    APPROACH (pinned three.js scene)
    ========================================================= */
 .approach{position:relative;background:var(--room)}
-.ap-pin{position:relative;height:100vh;overflow:hidden}
+.ap-pin{position:relative;height:100vh;height:100svh;overflow:hidden}
 #macGL{position:absolute;inset:0;z-index:1}
 #macGL canvas{width:100%!important;height:100%!important}
 .ap-lbl{position:absolute;z-index:3;left:var(--gut);top:calc(var(--navH) + 8px);color:var(--mute-on-ink)}
@@ -215,7 +220,7 @@ img,canvas,svg{display:block;max-width:100%}
 .work-intro p{margin:0;max-width:300px;color:var(--mute-on-paper)}
 .work-intro .lbl{grid-column:1/-1;display:flex;justify-content:space-between;border-bottom:1px solid var(--line-paper);padding-bottom:12px;margin-bottom:40px}
 .work{position:relative;background:var(--ink)}
-#stage{position:relative;height:100vh;overflow:hidden;color:var(--paper)}
+#stage{position:relative;height:100vh;height:100svh;overflow:hidden;color:var(--paper)}
 .shots{position:absolute;inset:0}
 .shot{position:absolute!important;inset:0}
 .w-slit{position:absolute;left:0;right:0;top:50%;z-index:3;height:1px;background:var(--paper);transform:scaleX(0)}
@@ -252,12 +257,13 @@ img,canvas,svg{display:block;max-width:100%}
    ONE STUDIO
    ========================================================= */
 .one{position:relative}
-.one-pin{height:100vh;padding:calc(var(--navH) + 40px) var(--gut) 40px;display:grid;grid-template-rows:auto 1fr auto;background:var(--paper);color:var(--ink)}
+.one-pin{height:100vh;height:100svh;padding:calc(var(--navH) + 40px) var(--gut) 40px;display:grid;grid-template-rows:auto 1fr auto;background:var(--paper);color:var(--ink)}
 .one-top{display:flex;justify-content:space-between;border-bottom:1px solid var(--line-paper);padding-bottom:12px}
 .one-word{align-self:center;margin:0;font:600 clamp(80px,13.6vw,196px)/1.04 var(--sans);letter-spacing:-.07em;white-space:nowrap;height:1.04em;overflow:hidden;position:relative}
 .one-word span{position:absolute;left:0;top:0}
 .one-bot{display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
 .one-bot p{margin:0}
+.one-bot .ulink{white-space:nowrap}
 
 /* =========================================================
    FOOTER
@@ -372,9 +378,46 @@ html.y84 .hero-grid .dots{display:none}
 }
 @media (max-width:560px){
   .pill span{display:none}
-  .hero-side .acts .btn.ghost{display:none}
   .ck .row{grid-template-columns:1fr}
 }
+
+/* ---------- phones & tablets: same content and interactions as desktop ---------- */
+@media (max-width:860px){
+  .hero{min-height:620px}
+  #kpGL{top:calc(var(--navH) + 4px);height:max(150px,calc(100svh - 520px))}
+  .one-word{font-size:15.5vw}
+  .hero-side .acts{display:flex;flex-wrap:wrap;gap:8px}
+  .ap-word{font-size:15vw}
+  .ap-word.d1{top:11%}
+  .ap-word.d2{top:63%;bottom:auto}
+  .ap-idx{display:none}
+  .ap-step{left:var(--gut);right:var(--gut);top:auto;bottom:5%;width:auto;height:118px}
+  .ap-step p{font-size:15px}
+  .ap-hint{display:flex;left:auto;right:var(--gut);transform:none;top:calc(var(--navH) + 8px);bottom:auto}
+  .ap-lbl{top:calc(var(--navH) + 8px)}
+  .w-index{top:calc(var(--navH) + 44px)}
+  .ft-h{margin:20px 0 44px}
+  .ft-mail{font-size:24px;word-break:break-all}
+}
+@media (max-width:560px){
+  .nav{gap:10px}
+  .pill{width:36px;padding:0;justify-content:center}
+  .menu-btn #menuLbl{display:none}
+  .hero-side .btn{height:44px;font-size:15px}
+  .hero-side .btn .btn-l{padding:0 14px}
+  .hero-side .btn .btn-i{width:44px}
+  .hero-side p{font-size:15px}
+  .w-infos{height:170px}
+  .w-info .brief{font-size:17px}
+  .ft-grid{grid-template-columns:1fr}
+  .ft-end{flex-direction:column;align-items:flex-start;gap:12px}
+  .ft-end .r{justify-items:start;text-align:left}
+  .ck{left:12px;right:12px;bottom:12px;width:auto;padding:20px}
+  .ck h3{font-size:24px}
+  .modal{padding:22px}
+  .modal h2{font-size:30px}
+}
+@media (max-width:380px){ .secind{display:none} }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
 }
